@@ -90,7 +90,7 @@ const GraphViz = () => {
               y={node.y + 5}
               textAnchor="middle"
               className="text-sm font-mono font-bold"
-              fill={visited.has(node.id) ? "hsl(175, 80%, 50%)" : "hsl(210, 20%, 90%)"}
+              fill={visited.has(node.id) ? "hsl(211, 100%, 50%)" : "hsl(var(--foreground))"}
             >
               {node.label}
             </text>
