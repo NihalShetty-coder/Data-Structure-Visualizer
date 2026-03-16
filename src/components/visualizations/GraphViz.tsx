@@ -61,12 +61,12 @@ const GraphViz = () => {
               r={20}
               fill={
                 activeNode === node.id
-                  ? "hsl(175, 80%, 50%, 0.2)"
+                  ? "hsl(211, 100%, 50%, 0.2)"
                   : visited.has(node.id)
-                  ? "hsl(175, 80%, 50%, 0.08)"
-                  : "hsl(220, 18%, 10%)"
+                  ? "hsl(211, 100%, 50%, 0.08)"
+                  : "hsl(var(--surface-2))"
               }
-              stroke={visited.has(node.id) ? "hsl(175, 80%, 50%)" : "hsl(220, 16%, 18%)"}
+              stroke={visited.has(node.id) ? "hsl(211, 100%, 50%)" : "hsl(var(--border))"}
               strokeWidth={2}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
