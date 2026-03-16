@@ -78,7 +78,7 @@ const GraphViz = () => {
                 cy={node.y}
                 r={20}
                 fill="none"
-                stroke="hsl(175, 80%, 50%)"
+                stroke="hsl(211, 100%, 50%)"
                 strokeWidth={1}
                 initial={{ r: 20, opacity: 1 }}
                 animate={{ r: 35, opacity: 0 }}
