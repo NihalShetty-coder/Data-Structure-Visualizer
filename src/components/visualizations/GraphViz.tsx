@@ -47,7 +47,7 @@ const GraphViz = () => {
               initial={{ pathLength: 0 }}
               animate={{
                 pathLength: 1,
-                stroke: edgeActive ? "hsl(175, 80%, 50%)" : "hsl(220, 16%, 18%)",
+                stroke: edgeActive ? "hsl(211, 100%, 50%)" : "hsl(var(--border))",
               }}
               transition={{ delay: i * 0.05, duration: 0.4 }}
             />
