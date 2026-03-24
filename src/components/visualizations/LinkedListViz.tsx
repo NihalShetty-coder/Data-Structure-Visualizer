@@ -1,63 +1,88 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useStepStore } from "../../store/stepStore";
+import { nodeColor } from "./nodeColors";
+import type { DSNode } from "../../engine/types";
 
-const nodes = ["H", "E", "L", "L", "O"];
+const Arrow = () => (
+  <div className="flex items-center text-muted-foreground text-sm select-none">
+    <div className="w-6 h-px bg-border relative">
+      <span className="absolute -right-1 -top-2 text-xs">›</span>
+    </div>
+  </div>
+);
+
+const NullTerminator = () => (
+  <div className="flex flex-col items-center">
+    <div className="w-12 h-12 border-2 border-dashed border-border rounded-lg flex items-center justify-center">
+      <span className="text-[10px] font-mono text-muted-foreground">null</span>
+    </div>
+  </div>
+);
+
+const NodeBox = ({ node, pointerLabels }: { node: DSNode; pointerLabels: string[] }) => {
+  const colors = nodeColor(node.state);
+  return (
+    <motion.div
+      layout
+      key={node.id}
+      initial={{ opacity: 0, scale: 0.7 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.7 }}
+      transition={{ type: "spring", stiffness: 300, damping: 22 }}
+      className="relative flex flex-col items-center"
+    >
+      {pointerLabels.length > 0 && (
+        <div className="absolute -top-6 flex gap-1">
+          {pointerLabels.map((l) => (
+            <span key={l} className="text-[10px] text-primary font-mono bg-primary/10 px-1 rounded">
+              {l}
+            </span>
+          ))}
+        </div>
+      )}
+      <div
+        className={`w-12 h-12 border-2 rounded-lg flex items-center justify-center font-mono text-sm font-semibold transition-all duration-300
+          ${colors.border} ${colors.bg} ${colors.text}
+          ${colors.glow ? "shadow-[0_0_12px_2px_hsl(175_80%_50%/0.35)]" : ""}
+        `}
+      >
+        {node.value}
+      </div>
+    </motion.div>
+  );
+};
 
 const LinkedListViz = () => {
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const { frames, currentStep } = useStepStore();
+  const frame = frames[currentStep];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev >= nodes.length - 1 ? -1 : prev + 1));
-    }, 700);
-    return () => clearInterval(interval);
-  }, []);
+  if (!frame || frame.nodes.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+        Press <span className="mx-1 font-mono text-primary">Visualize</span> to start
+      </div>
+    );
+  }
+
+  const pointers = frame.pointers ?? {};
 
   return (
-    <div className="flex items-center justify-center h-full">
-      <div className="flex items-center gap-0">
-        {nodes.map((val, i) => (
-          <div key={i} className="flex items-center">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{
-                scale: 1,
-                borderColor: i <= activeIndex ? "hsl(175, 80%, 50%)" : "hsl(220, 16%, 18%)",
-                backgroundColor: i === activeIndex ? "hsl(175, 80%, 50%, 0.15)" : "transparent",
-              }}
-              transition={{ delay: i * 0.1, duration: 0.3 }}
-              className="w-14 h-14 border-2 rounded-lg flex items-center justify-center font-mono text-lg font-bold text-foreground relative"
-            >
-              {val}
-              {i <= activeIndex && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"
-                />
-              )}
-            </motion.div>
-            {i < nodes.length - 1 && (
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: i * 0.1 + 0.15 }}
-                className="flex items-center origin-left"
-              >
-                <div className={`w-8 h-0.5 ${i < activeIndex ? "bg-primary" : "bg-border"} transition-colors`} />
-                <div className={`w-0 h-0 border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent border-l-[6px] ${i < activeIndex ? "border-l-primary" : "border-l-border"} transition-colors`} />
-              </motion.div>
-            )}
-          </div>
-        ))}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="ml-2 text-xs text-muted-foreground font-mono"
-        >
-          null
-        </motion.div>
+    <div className="flex items-center justify-center h-full overflow-x-auto px-6">
+      <div className="flex items-center gap-0 flex-wrap justify-center gap-y-6">
+        <AnimatePresence mode="popLayout">
+          {frame.nodes.map((node) => {
+            const ptrLabels = Object.entries(pointers)
+              .filter(([, id]) => id === node.id)
+              .map(([n]) => n);
+            return (
+              <div key={node.id} className="flex items-center">
+                <NodeBox node={node} pointerLabels={ptrLabels} />
+                <Arrow />
+              </div>
+            );
+          })}
+        </AnimatePresence>
+        <NullTerminator />
       </div>
     </div>
   );

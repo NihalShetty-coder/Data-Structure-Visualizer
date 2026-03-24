@@ -1,58 +1,71 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-
-const values = [42, 17, 8, 31, 56, 23, 64, 12];
+import { motion, AnimatePresence } from "framer-motion";
+import { useStepStore } from "../../store/stepStore";
+import { nodeColor } from "./nodeColors";
 
 const ArrayViz = () => {
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const { frames, currentStep } = useStepStore();
+  const frame = frames[currentStep];
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % values.length);
-    }, 800);
-    return () => clearInterval(interval);
-  }, []);
+  if (!frame || frame.nodes.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
+        Press <span className="mx-1 font-mono text-primary">Visualize</span> to start
+      </div>
+    );
+  }
+
+  const pointers = frame.pointers ?? {};
 
   return (
     <div className="flex items-center justify-center h-full">
-      <div className="flex gap-2">
-        {values.map((val, i) => (
-          <motion.div
-            key={i}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{
-              scale: 1,
-              opacity: 1,
-              y: activeIndex === i ? -12 : 0,
-            }}
-            transition={{
-              delay: i * 0.08,
-              y: { type: "spring", stiffness: 300, damping: 20 },
-            }}
-            className={`relative flex flex-col items-center`}
-          >
-            <motion.div
-              animate={{
-                borderColor: activeIndex === i ? "hsl(175, 80%, 50%)" : "hsl(220, 16%, 18%)",
-                backgroundColor: activeIndex === i ? "hsl(175, 80%, 50%, 0.1)" : "transparent",
-              }}
-              className="w-14 h-14 border-2 rounded-lg flex items-center justify-center font-mono text-sm font-semibold text-foreground"
-            >
-              {val}
-            </motion.div>
-            <span className="text-[10px] text-muted-foreground mt-1 font-mono">[{i}]</span>
-            {activeIndex === i && (
+      <div className="flex flex-wrap gap-2 justify-center px-4">
+        <AnimatePresence mode="popLayout">
+          {frame.nodes.map((node, i) => {
+            const colors = nodeColor(node.state);
+            // resolve pointer labels for this node
+            const ptrLabels = Object.entries(pointers)
+              .filter(([, id]) => id === node.id)
+              .map(([name]) => name);
+
+            return (
               <motion.div
-                layoutId="array-pointer"
-                className="absolute -top-6 text-primary text-xs font-mono"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
+                key={node.id}
+                layout
+                initial={{ scale: 0, opacity: 0, y: 20 }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                  y: node.state === "active" || node.state === "comparing" ? -10 : 0,
+                }}
+                exit={{ scale: 0, opacity: 0, y: -20 }}
+                transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                className="relative flex flex-col items-center"
               >
-                ▼
+                {/* Pointer labels above cell */}
+                {ptrLabels.length > 0 && (
+                  <div className="absolute -top-6 flex gap-1">
+                    {ptrLabels.map((l) => (
+                      <span key={l} className="text-[10px] text-primary font-mono bg-primary/10 px-1 rounded">
+                        {l}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Cell */}
+                <div
+                  className={`w-14 h-14 border-2 rounded-lg flex items-center justify-center font-mono text-sm font-semibold transition-all duration-300
+                    ${colors.border} ${colors.bg} ${colors.text}
+                    ${colors.glow ? "shadow-[0_0_12px_2px_hsl(175_80%_50%/0.35)]" : ""}
+                  `}
+                >
+                  {node.value}
+                </div>
+                <span className="text-[10px] text-muted-foreground mt-1 font-mono">[{i}]</span>
               </motion.div>
-            )}
-          </motion.div>
-        ))}
+            );
+          })}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -44,7 +44,7 @@ const codeSnippets: Record<string, string[]> = {
     "const front = queue.shift(); // 'A'",
     "process(front);",
   ],
-  tree: [
+  "binary-tree": [
     "function inorder(node) {",
     "  if (!node) return;",
     "  inorder(node.left);",
