@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 
 # Data Structure Visualizer
 
@@ -16,7 +14,7 @@ An interactive web application for visualizing and understanding core data struc
 
 ## Demo
 
-Try it live: [Demo Link Coming Soon]
+https://data-structure-visualizer-9033ftdw5-nihalshetty-coders-projects.vercel.app
 
 
 ## Getting Started
@@ -42,15 +40,6 @@ Open http://localhost:8080 in your browser.
 - Tailwind CSS
 
 
-## Deployment
-
-
-You can deploy this project using any static hosting service (Vercel, Netlify, GitHub Pages, etc.).
-
-## License
-
-MIT
-=======
 # Data Structure Visualizer
 
 An interactive web application that helps users understand fundamental data structures through real-time visualization and step-by-step animations. Designed for students, educators, and interview preparation, the platform simplifies complex concepts by visually demonstrating how operations work internally.
@@ -112,11 +101,6 @@ This project was built to:
 
 ---
 
-## 📷 Preview
-
-_Add screenshots / demo GIFs here_
-
----
 
 ## 📦 Installation
 
